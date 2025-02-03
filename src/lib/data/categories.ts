@@ -7,6 +7,8 @@ export const listCategories = async (query?: Record<string, any>) => {
     ...(await getCacheOptions("categories")),
   }
 
+  console.log('DEBUG', process.env['MEDUSA_BACKEND_URL'])
+
   const limit = query?.limit || 100
 
   return sdk.client
