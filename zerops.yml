@@ -1,0 +1,43 @@
+zerops:
+  - setup: nextstore
+    build:
+      base: nodejs@22
+      envVariables:
+        MEDUSA_BACKEND_URL: ${RUNTIME_MEDUSA_BACKEND_URL}
+        NEXT_PUBLIC_SEARCH_ENDPOINT: ${SEARCH_URL}
+        NEXT_PUBLIC_SEARCH_API_KEY: ${RUNTIME_NEXT_PUBLIC_SEARCH_API_KEY}
+        NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${RUNTIME_NEXT_PUBLIC_SEARCH_API_KEY}
+        NEXT_PUBLIC_BASE_URL: ${NEXT_STORE_URL}
+        NEXT_PUBLIC_DEFAULT_REGION: ${RUNTIME_NEXT_PUBLIC_DEFAULT_REGION}
+        NEXT_PUBLIC_FEATURE_SEARCH_ENABLED: ${RUNTIME_NEXT_PUBLIC_FEATURE_SEARCH_ENABLED}
+        NEXT_PUBLIC_INDEX_NAME: ${RUNTIME_NEXT_PUBLIC_INDEX_NAME}
+        OBJECT_STORAGE_API_URL: ${RUNTIME_OBJECT_STORAGE_API_URL}
+      buildCommands:
+        - yarn
+        - yarn build
+      deployFiles:
+        - .next
+        - package.json
+        - next.config.js
+        - yarn.lock
+        - node_modules
+        - public
+        - check-env-variables.js
+        - utils
+      cache: node_modules
+    run:
+      base: nodejs@22
+      start: yarn start
+      ports:
+        - port: 8000
+          httpSupport: true
+      envVariables:
+        MEDUSA_BACKEND_URL: ${MEDUSA_INSTANCE_URL}
+        OBJECT_STORAGE_API_URL: ${storage_apiUrl}
+        NEXT_PUBLIC_BASE_URL: ${NEXT_STORE_URL}
+        NEXT_PUBLIC_SEARCH_ENDPOINT: ${SEARCH_URL}
+        NEXT_PUBLIC_DEFAULT_REGION: de
+        NEXT_PUBLIC_FEATURE_SEARCH_ENABLED: true
+        NEXT_PUBLIC_INDEX_NAME: products
+        NEXT_PUBLIC_SEARCH_API_KEY: ${medusa_PUBLIC_SEARCH_API_KEY}
+        NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${medusa_CHANNEL_PUBLISHABLE_KEY}
