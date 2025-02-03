@@ -26,7 +26,7 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: process.env.OBJECT_STORAGE_API_URL
+        hostname: "storage-prg1.zerops.io"
       },
     ],
   },
