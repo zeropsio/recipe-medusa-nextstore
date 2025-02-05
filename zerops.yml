@@ -21,12 +21,13 @@ zerops:
         - next.config.js
         - yarn.lock
         - .yarnrc.yml
+        - node_modules
         - public
         - check-env-variables.js
       cache: node_modules
     run:
       base: nodejs@22
-      start: npm start
+      start: yarn start
       ports:
         - port: 8000
           httpSupport: true
