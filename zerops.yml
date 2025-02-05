@@ -21,7 +21,6 @@ zerops:
         - next.config.js
         - yarn.lock
         - .yarnrc.yml
-        - node_modules
         - public
         - check-env-variables.js
       cache: node_modules
