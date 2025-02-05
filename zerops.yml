@@ -26,7 +26,7 @@ zerops:
       cache: node_modules
     run:
       base: nodejs@22
-      start: yarn start
+      start: npm start
       ports:
         - port: 8000
           httpSupport: true
