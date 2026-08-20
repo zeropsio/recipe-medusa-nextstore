@@ -1,4 +1,4 @@
-import { Checkbox, Label } from "@medusajs/ui"
+import { Checkbox, Label } from "@modules/common/components/ui"
 import React from "react"
 
 type CheckboxProps = {
@@ -22,8 +22,8 @@ const CheckboxWithLabel: React.FC<CheckboxProps> = ({
         className="text-base-regular flex items-center gap-x-2"
         id="checkbox"
         role="checkbox"
-        type="button"
         checked={checked}
+        readOnly
         aria-checked={checked}
         onClick={onChange}
         name={name}
@@ -32,7 +32,6 @@ const CheckboxWithLabel: React.FC<CheckboxProps> = ({
       <Label
         htmlFor="checkbox"
         className="!transform-none !txt-medium"
-        size="large"
       >
         {label}
       </Label>
