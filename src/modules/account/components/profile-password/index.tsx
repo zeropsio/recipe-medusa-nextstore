@@ -1,21 +1,22 @@
 "use client"
 
-import React, { useEffect, useActionState } from "react"
+import React from "react"
 import Input from "@modules/common/components/input"
 import AccountInfo from "../account-info"
 import { HttpTypes } from "@medusajs/types"
-import { toast } from "@medusajs/ui"
+// TODO: Re-add toast notifications when Toaster component is implemented
 
 type MyInformationProps = {
   customer: HttpTypes.StoreCustomer
 }
 
-const ProfilePassword: React.FC<MyInformationProps> = ({ customer }) => {
+const ProfilePassword: React.FC<MyInformationProps> = ({ customer: _customer }) => {
   const [successState, setSuccessState] = React.useState(false)
 
   // TODO: Add support for password updates
   const updatePassword = async () => {
-    toast.info("Password update is not implemented")
+    // TODO: Re-add toast notification when Toaster component is implemented
+    console.info("Password update is not implemented")
   }
 
   const clearState = () => {

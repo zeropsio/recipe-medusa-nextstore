@@ -1,17 +1,28 @@
+# yaml-language-server: $schema=https://api.app-prg1.zerops.io/api/rest/public/settings/zerops-yaml-json-schema.json
+#
+# NEXT_PUBLIC_* values are baked into the Next.js bundle at build time.
+# Setup name `nextstore` must match import.yaml zeropsSetup.
+# Value store: APP_URL / API_URL (aliases NEXT_STORE_URL / MEDUSA_INSTANCE_URL stay in import).
+
 zerops:
   - setup: nextstore
     build:
       base: nodejs@22
       envVariables:
-        MEDUSA_BACKEND_URL: ${MEDUSA_INSTANCE_URL}
+        MEDUSA_BACKEND_URL: ${API_URL}
+        NEXT_PUBLIC_MEDUSA_BACKEND_URL: ${API_URL}
+        NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${RUNTIME_NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}
+        NEXT_PUBLIC_BASE_URL: ${APP_URL}
+        NEXT_PUBLIC_DEFAULT_REGION: ${RUNTIME_NEXT_PUBLIC_DEFAULT_REGION}
         NEXT_PUBLIC_SEARCH_ENDPOINT: ${SEARCH_URL}
         NEXT_PUBLIC_SEARCH_API_KEY: ${RUNTIME_NEXT_PUBLIC_SEARCH_API_KEY}
-        NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${RUNTIME_NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}
-        NEXT_PUBLIC_BASE_URL: ${NEXT_STORE_URL}
-        NEXT_PUBLIC_DEFAULT_REGION: ${RUNTIME_NEXT_PUBLIC_DEFAULT_REGION}
         NEXT_PUBLIC_FEATURE_SEARCH_ENABLED: ${RUNTIME_NEXT_PUBLIC_FEATURE_SEARCH_ENABLED}
         NEXT_PUBLIC_INDEX_NAME: ${RUNTIME_NEXT_PUBLIC_INDEX_NAME}
         OBJECT_STORAGE_API_URL: ${RUNTIME_OBJECT_STORAGE_API_URL}
+        NEXT_PUBLIC_STRIPE_KEY: ${STRIPE_PUBLISHABLE_KEY}
+      # Yarn Berry 3.2.3 via packageManager — enable Corepack so the image's Yarn 1 is not used.
+      prepareCommands:
+        - corepack enable
       buildCommands:
         - yarn
         - yarn build
@@ -24,20 +35,29 @@ zerops:
         - node_modules
         - public
         - check-env-variables.js
+      # Do not cache .next — Zerops cache restore can cause EACCES on later builds.
       cache: node_modules
+    deploy:
+      readinessCheck:
+        httpGet:
+          port: 8000
+          path: /
     run:
       base: nodejs@22
-      start: yarn start
+      # next binary — runtime must not depend on Corepack / Yarn 3 being on PATH.
+      start: ./node_modules/.bin/next start -p 8000
       ports:
         - port: 8000
           httpSupport: true
       envVariables:
-        MEDUSA_BACKEND_URL: ${MEDUSA_INSTANCE_URL}
-        OBJECT_STORAGE_API_URL: ${storage_apiUrl}
-        NEXT_PUBLIC_BASE_URL: ${NEXT_STORE_URL}
-        NEXT_PUBLIC_SEARCH_ENDPOINT: ${SEARCH_URL}
+        MEDUSA_BACKEND_URL: ${API_URL}
+        NEXT_PUBLIC_MEDUSA_BACKEND_URL: ${API_URL}
+        NEXT_PUBLIC_BASE_URL: ${APP_URL}
         NEXT_PUBLIC_DEFAULT_REGION: de
-        NEXT_PUBLIC_FEATURE_SEARCH_ENABLED: true
+        NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${medusa_CHANNEL_PUBLISHABLE_KEY}
+        NEXT_PUBLIC_SEARCH_ENDPOINT: ${SEARCH_URL}
+        NEXT_PUBLIC_FEATURE_SEARCH_ENABLED: "true"
         NEXT_PUBLIC_INDEX_NAME: products
         NEXT_PUBLIC_SEARCH_API_KEY: ${search_defaultSearchKey}
-        NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${medusa_CHANNEL_PUBLISHABLE_KEY}
+        OBJECT_STORAGE_API_URL: ${storage_apiUrl}
+        NEXT_PUBLIC_STRIPE_KEY: ${STRIPE_PUBLISHABLE_KEY}

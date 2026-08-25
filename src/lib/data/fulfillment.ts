@@ -18,7 +18,9 @@ export const listCartShippingMethods = async (cartId: string) => {
       `/store/shipping-options`,
       {
         method: "GET",
-        query: { cart_id: cartId },
+        query: {
+          cart_id: cartId,
+        },
         headers,
         next,
         cache: "force-cache",
@@ -60,7 +62,7 @@ export const calculatePriceForShippingOption = async (
       }
     )
     .then(({ shipping_option }) => shipping_option)
-    .catch((e) => {
+    .catch((_e) => {
       return null
     })
 }

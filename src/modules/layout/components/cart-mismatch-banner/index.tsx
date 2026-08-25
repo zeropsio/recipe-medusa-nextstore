@@ -3,9 +3,8 @@
 import { transferCart } from "@lib/data/customer"
 import { ExclamationCircleSolid } from "@medusajs/icons"
 import { StoreCart, StoreCustomer } from "@medusajs/types"
-import { Button } from "@medusajs/ui"
+import { Button } from "@modules/common/components/ui"
 import { useState } from "react"
-
 function CartMismatchBanner(props: {
   customer: StoreCustomer
   cart: StoreCart
@@ -43,7 +42,7 @@ function CartMismatchBanner(props: {
         <Button
           variant="transparent"
           className="hover:bg-transparent active:bg-transparent focus:bg-transparent disabled:text-orange-500 text-orange-950 p-0 bg-transparent"
-          size="base"
+          size="medium"
           disabled={isPending}
           onClick={handleSubmit}
         >
