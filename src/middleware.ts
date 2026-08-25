@@ -1,10 +1,11 @@
 import { HttpTypes } from "@medusajs/types"
 import { NextRequest, NextResponse } from "next/server"
 
+// Prefer the private service URL on the server. NEXT_PUBLIC_ is the browser origin.
 const BACKEND_URL =
-  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || process.env.MEDUSA_BACKEND_URL
+  process.env.MEDUSA_BACKEND_URL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
 const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
-const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "dk"
+const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "de"
 
 const regionMapCache = {
   regionMap: new Map<string, HttpTypes.StoreRegion>(),
@@ -15,9 +16,10 @@ async function getRegionMap(cacheId: string) {
   const { regionMap, regionMapUpdated } = regionMapCache
 
   if (!BACKEND_URL) {
-    throw new Error(
-      "Middleware.ts: Error fetching regions. Did you set up regions in your Medusa Admin and define a NEXT_PUBLIC_MEDUSA_BACKEND_URL environment variable."
+    console.error(
+      "Middleware.ts: MEDUSA_BACKEND_URL / NEXT_PUBLIC_MEDUSA_BACKEND_URL is unset."
     )
+    return regionMap
   }
 
   if (
@@ -38,7 +40,10 @@ async function getRegionMap(cacheId: string) {
     })
 
     if (!response.ok) {
-      throw new Error(`Backend returned ${response.status}`)
+      console.error(
+        `Middleware.ts: /store/regions returned ${response.status} from ${BACKEND_URL}`
+      )
+      return regionMap
     }
 
     const json = await response.json()
@@ -109,7 +114,13 @@ export async function middleware(request: NextRequest) {
   const cacheIdCookie = request.cookies.get("_medusa_cache_id")
   const cacheId = cacheIdCookie?.value || crypto.randomUUID()
 
-  const regionMap = await getRegionMap(cacheId)
+  let regionMap: Map<string, HttpTypes.StoreRegion>
+  try {
+    regionMap = await getRegionMap(cacheId)
+  } catch (error) {
+    console.error("Middleware.ts: region lookup failed; using default country.", error)
+    regionMap = new Map()
+  }
   const countryCode = await getCountryCode(request, regionMap)
 
   // if the country code is available, use it, otherwise use the default region

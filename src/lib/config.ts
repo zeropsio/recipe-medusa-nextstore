@@ -1,10 +1,10 @@
 import { getLocaleHeader } from "@lib/util/get-locale-header"
 import Medusa, { FetchArgs, FetchInput } from "@medusajs/js-sdk"
 
-// Defaults to standard port for Medusa server
+// Server-side (RSC) should use the private hostname. The browser uses NEXT_PUBLIC_.
 let MEDUSA_BACKEND_URL =
-  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ||
   process.env.MEDUSA_BACKEND_URL ||
+  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ||
   "http://localhost:9000"
 
 export const sdk = new Medusa({
