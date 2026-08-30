@@ -11,9 +11,9 @@ zerops:
       envVariables:
         MEDUSA_BACKEND_URL: ${API_URL}
         NEXT_PUBLIC_MEDUSA_BACKEND_URL: ${API_URL}
-        NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${RUNTIME_NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}
+        NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${medusa_CHANNEL_PUBLISHABLE_KEY}
         NEXT_PUBLIC_BASE_URL: ${APP_URL}
-        NEXT_PUBLIC_DEFAULT_REGION: ${RUNTIME_NEXT_PUBLIC_DEFAULT_REGION}
+        NEXT_PUBLIC_DEFAULT_REGION: de
         NEXT_PUBLIC_SEARCH_ENDPOINT: ${SEARCH_URL}
         NEXT_PUBLIC_SEARCH_API_KEY: ${RUNTIME_NEXT_PUBLIC_SEARCH_API_KEY}
         NEXT_PUBLIC_FEATURE_SEARCH_ENABLED: ${RUNTIME_NEXT_PUBLIC_FEATURE_SEARCH_ENABLED}
@@ -38,19 +38,24 @@ zerops:
       # Do not cache .next — Zerops cache restore can cause EACCES on later builds.
       cache: node_modules
     deploy:
+      # `/` runs region middleware against Medusa and 500s if the API is still seeding.
       readinessCheck:
         httpGet:
           port: 8000
-          path: /
+          path: /api/health
     run:
       base: nodejs@22
       # next binary — runtime must not depend on Corepack / Yarn 3 being on PATH.
       start: ./node_modules/.bin/next start -p 8000
+      healthCheck:
+        httpGet:
+          port: 8000
+          path: /api/health
       ports:
         - port: 8000
           httpSupport: true
       envVariables:
-        MEDUSA_BACKEND_URL: ${API_URL}
+        MEDUSA_BACKEND_URL: http://${medusa_hostname}:9000
         NEXT_PUBLIC_MEDUSA_BACKEND_URL: ${API_URL}
         NEXT_PUBLIC_BASE_URL: ${APP_URL}
         NEXT_PUBLIC_DEFAULT_REGION: de
