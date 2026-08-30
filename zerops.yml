@@ -47,6 +47,10 @@ zerops:
       base: nodejs@22
       # next binary — runtime must not depend on Corepack / Yarn 3 being on PATH.
       start: ./node_modules/.bin/next start -p 8000
+      healthCheck:
+        httpGet:
+          port: 8000
+          path: /api/health
       ports:
         - port: 8000
           httpSupport: true
