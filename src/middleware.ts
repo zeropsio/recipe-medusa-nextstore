@@ -24,7 +24,7 @@ async function getRegionMap(cacheId: string) {
 
   if (
     !regionMap.keys().next().value ||
-    regionMapUpdated < Date.now() - 3600 * 1000
+    regionMapUpdated < Date.now() - 60 * 1000
   ) {
     try {
       // Fetch regions from Medusa. We can't use the JS client here because middleware is running on Edge and the client needs a Node environment.
@@ -33,11 +33,7 @@ async function getRegionMap(cacheId: string) {
         headers: PUBLISHABLE_API_KEY
           ? { "x-publishable-api-key": PUBLISHABLE_API_KEY }
           : undefined,
-        next: {
-          revalidate: 3600,
-          tags: [`regions-${cacheId}`],
-        },
-        cache: "force-cache",
+        cache: "no-store",
       })
 
       if (!response.ok) {
