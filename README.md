@@ -1,7 +1,7 @@
 # Zerops x Medusa Next.js storefront
 
 <!-- #ZEROPS_EXTRACT_START:intro# -->
-Official Medusa v2.19 Next.js App Router storefront for the [recipe-medusa](https://github.com/zeropsio/recipe-medusa) backend. Runs as Node SSR on Zerops (port 8000) and talks to Medusa with `NEXT_PUBLIC_MEDUSA_BACKEND_URL` plus a publishable API key.
+Official Medusa v2.19 Next.js 16 App Router storefront for the [recipe-medusa](https://github.com/zeropsio/recipe-medusa) backend. Runs as Node SSR on Zerops (port 8000) and talks to Medusa with `NEXT_PUBLIC_MEDUSA_BACKEND_URL` plus a publishable API key.
 <!-- #ZEROPS_EXTRACT_END:intro# -->
 
 ## Local development
@@ -24,7 +24,7 @@ Storefront: `http://localhost:8000`
 Place [`zerops.yml`](zerops.yml) at the repository root. Setup name `nextstore` must match `zeropsSetup` in the import yaml.
 
 - Build: `nodejs@22`, `corepack enable`, then Yarn Berry 3.2.3 (`packageManager`). `NEXT_PUBLIC_*` is baked in at build time — set the same keys on `build.envVariables` and `run.envVariables`.
-- Run: port `8000`, start `./node_modules/.bin/next start -p 8000` (do not rely on Yarn 3 being on the runtime PATH). Readiness check is `/api/health` — do not probe `/` (region middleware calls Medusa and 500s while the API is still seeding).
+- Run: port `8000`, start `./node_modules/.bin/next start -p 8000` (do not rely on Yarn 3 being on the runtime PATH). Readiness check is `/api/health` — do not probe `/` (region proxy calls Medusa and 500s while the API is still seeding).
 - Map `API_URL` → `NEXT_PUBLIC_MEDUSA_BACKEND_URL` (browser) and `http://${medusa_hostname}:9000` → `MEDUSA_BACKEND_URL` (server). `APP_URL` → `NEXT_PUBLIC_BASE_URL`. The publishable key comes from `medusa_CHANNEL_PUBLISHABLE_KEY` after backend seed. Map `STRIPE_PUBLISHABLE_KEY` → `NEXT_PUBLIC_STRIPE_KEY` for Stripe (set `STRIPE_API_KEY` on the backend too).
 
 This service is Node SSR — do not switch it to `type: static` or `output: 'export'`.

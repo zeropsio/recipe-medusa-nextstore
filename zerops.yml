@@ -38,7 +38,7 @@ zerops:
       # Do not cache .next — Zerops cache restore can cause EACCES on later builds.
       cache: node_modules
     deploy:
-      # `/` runs region middleware against Medusa and 500s if the API is still seeding.
+      # `/` runs the region proxy against Medusa and 500s if the API is still seeding.
       readinessCheck:
         httpGet:
           port: 8000

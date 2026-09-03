@@ -21,7 +21,7 @@ async function getRegionMap(cacheId: string) {
 
   if (!BACKEND_URL) {
     console.error(
-      "Middleware.ts: MEDUSA_BACKEND_URL / NEXT_PUBLIC_MEDUSA_BACKEND_URL is unset."
+      "proxy.ts: MEDUSA_BACKEND_URL / NEXT_PUBLIC_MEDUSA_BACKEND_URL is unset."
     )
     return regionMap
   }
@@ -31,7 +31,8 @@ async function getRegionMap(cacheId: string) {
     regionMapUpdated < Date.now() - 60 * 1000
   ) {
     try {
-      // Fetch regions from Medusa. We can't use the JS client here because middleware is running on Edge and the client needs a Node environment.
+      // Fetch regions from Medusa. Keep this as fetch so proxy startup does not
+      // depend on the JS SDK being initialized in the Node request path.
       const response = await fetch(`${BACKEND_URL}/store/regions`, {
         method: "GET",
         headers: PUBLISHABLE_API_KEY
@@ -42,7 +43,7 @@ async function getRegionMap(cacheId: string) {
 
       if (!response.ok) {
         console.error(
-          `Middleware.ts: /store/regions returned ${response.status} from ${BACKEND_URL}`
+          `proxy.ts: /store/regions returned ${response.status} from ${BACKEND_URL}`
         )
         return regionMap
       }
@@ -65,7 +66,7 @@ async function getRegionMap(cacheId: string) {
       regionMapCache.regionMapUpdated = Date.now()
     } catch (error) {
       console.error(
-        "Middleware.ts: failed to fetch regions; continuing with default country.",
+        "proxy.ts: failed to fetch regions; continuing with default country.",
         error
       )
     }
@@ -111,9 +112,9 @@ async function getCountryCode(
 }
 
 /**
- * Middleware to handle region selection and onboarding status.
+ * Proxy to handle region selection and onboarding status.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   try {
     if (request.nextUrl.pathname.includes(".")) {
       return NextResponse.next()
@@ -127,7 +128,7 @@ export async function middleware(request: NextRequest) {
       regionMap = await getRegionMap(cacheId)
     } catch (error) {
       console.error(
-        "Middleware.ts: region lookup failed; using default country.",
+        "proxy.ts: region lookup failed; using default country.",
         error
       )
       regionMap = new Map()
@@ -158,7 +159,7 @@ export async function middleware(request: NextRequest) {
 
     return NextResponse.redirect(redirectUrl, 307)
   } catch (error) {
-    console.error("Middleware.ts: unexpected failure; passing request through.", error)
+    console.error("proxy.ts: unexpected failure; passing request through.", error)
     return NextResponse.next()
   }
 }
