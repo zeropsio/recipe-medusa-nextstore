@@ -12,7 +12,9 @@ const requiredEnvs = [
 function checkEnvVariables() {
   const missingEnvs = requiredEnvs.filter(function (env) {
     c;
-    return !process.env[env.key];
+    return (
+      !process.env[env.key] && !process.env.MEDUSA_PUBLISHABLE_KEY
+    );
   });
 
   if (missingEnvs.length > 0) {

@@ -1,14 +1,10 @@
 import { HttpTypes } from "@medusajs/types"
 import { NextRequest, NextResponse } from "next/server"
+import {
+  getMedusaBackendUrl,
+  getMedusaPublishableKey,
+} from "./lib/util/env"
 
-// Prefer the private service URL on the server. NEXT_PUBLIC_ is the browser origin.
-const BACKEND_URL =
-  process.env.MEDUSA_BACKEND_URL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
-// NEXT_PUBLIC_* is inlined at build time; use MEDUSA_PUBLISHABLE_KEY at runtime when the
-// storefront was built before the backend wrote CHANNEL_PUBLISHABLE_KEY.
-const PUBLISHABLE_API_KEY =
-  process.env.MEDUSA_PUBLISHABLE_KEY ||
-  process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
 const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "de"
 
 const regionMapCache = {
@@ -18,8 +14,10 @@ const regionMapCache = {
 
 async function getRegionMap(cacheId: string) {
   const { regionMap, regionMapUpdated } = regionMapCache
+  const backendUrl = getMedusaBackendUrl()
+  const publishableKey = getMedusaPublishableKey()
 
-  if (!BACKEND_URL) {
+  if (!backendUrl) {
     console.error(
       "proxy.ts: MEDUSA_BACKEND_URL / NEXT_PUBLIC_MEDUSA_BACKEND_URL is unset."
     )
@@ -31,19 +29,24 @@ async function getRegionMap(cacheId: string) {
     regionMapUpdated < Date.now() - 60 * 1000
   ) {
     try {
+      if (!publishableKey) {
+        console.error(
+          "proxy.ts: publishable key is unset (MEDUSA_PUBLISHABLE_KEY / NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY)."
+        )
+        return regionMap
+      }
+
       // Fetch regions from Medusa. Keep this as fetch so proxy startup does not
       // depend on the JS SDK being initialized in the Node request path.
-      const response = await fetch(`${BACKEND_URL}/store/regions`, {
+      const response = await fetch(`${backendUrl}/store/regions`, {
         method: "GET",
-        headers: PUBLISHABLE_API_KEY
-          ? { "x-publishable-api-key": PUBLISHABLE_API_KEY }
-          : undefined,
+        headers: { "x-publishable-api-key": publishableKey },
         cache: "no-store",
       })
 
       if (!response.ok) {
         console.error(
-          `proxy.ts: /store/regions returned ${response.status} from ${BACKEND_URL}`
+          `proxy.ts: /store/regions returned ${response.status} from ${backendUrl}`
         )
         return regionMap
       }
