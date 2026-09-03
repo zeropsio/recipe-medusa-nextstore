@@ -4,7 +4,11 @@ import { NextRequest, NextResponse } from "next/server"
 // Prefer the private service URL on the server. NEXT_PUBLIC_ is the browser origin.
 const BACKEND_URL =
   process.env.MEDUSA_BACKEND_URL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
-const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+// NEXT_PUBLIC_* is inlined at build time; use MEDUSA_PUBLISHABLE_KEY at runtime when the
+// storefront was built before the backend wrote CHANNEL_PUBLISHABLE_KEY.
+const PUBLISHABLE_API_KEY =
+  process.env.MEDUSA_PUBLISHABLE_KEY ||
+  process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
 const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "de"
 
 const regionMapCache = {

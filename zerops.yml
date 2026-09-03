@@ -56,6 +56,7 @@ zerops:
           httpSupport: true
       envVariables:
         MEDUSA_BACKEND_URL: http://${medusa_hostname}:9000
+        MEDUSA_PUBLISHABLE_KEY: ${medusa_CHANNEL_PUBLISHABLE_KEY}
         NEXT_PUBLIC_MEDUSA_BACKEND_URL: ${API_URL}
         NEXT_PUBLIC_BASE_URL: ${APP_URL}
         NEXT_PUBLIC_DEFAULT_REGION: de
