@@ -46,7 +46,10 @@ zerops:
           path: /api/health
     run:
       base: nodejs@22
-      # next binary — runtime must not depend on Corepack / Yarn 3 being on PATH.
+      # next start — Yarn 3 is not on the runtime PATH. If the process still
+      # has an unresolved ${medusa_CHANNEL_PUBLISHABLE_KEY}, instrumentation
+      # exits so the supervisor respawns with the current env store. Medusa
+      # init also POSTs /api/internal/reload-env after seed.
       start: ./node_modules/.bin/next start -p 8000
       healthCheck:
         httpGet:
