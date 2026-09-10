@@ -9,13 +9,39 @@ const requiredEnvs = [
   },
 ];
 
+function isMissingPublishableKey() {
+  const keys = [
+    process.env.MEDUSA_PUBLISHABLE_KEY,
+    process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+    process.env.RUNTIME_NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+  ]
+
+  return !keys.some(function (value) {
+    if (!value) {
+      return false
+    }
+
+    if (value.includes("${")) {
+      return false
+    }
+
+    return value.trim().startsWith("pk_")
+  })
+}
+
 function checkEnvVariables() {
-  const missingEnvs = requiredEnvs.filter(function (env) {
-    c;
-    return (
-      !process.env[env.key] && !process.env.MEDUSA_PUBLISHABLE_KEY
-    );
-  });
+  if (!isMissingPublishableKey()) {
+    return
+  }
+
+  if (process.env.ZEROPS_ProjectId) {
+    console.warn(
+      "Build: publishable key not resolved yet; runtime will respawn until medusa CHANNEL_PUBLISHABLE_KEY is a pk_ key."
+    )
+    return
+  }
+
+  const missingEnvs = requiredEnvs;
 
   if (missingEnvs.length > 0) {
     console.error(
