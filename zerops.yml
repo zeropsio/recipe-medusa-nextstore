@@ -7,7 +7,7 @@
 zerops:
   - setup: nextstore
     build:
-      base: nodejs@22
+      base: nodejs@24
       envVariables:
         MEDUSA_BACKEND_URL: ${API_URL}
         MEDUSA_PUBLISHABLE_KEY: ${medusa_CHANNEL_PUBLISHABLE_KEY}
@@ -45,7 +45,7 @@ zerops:
           port: 8000
           path: /api/health
     run:
-      base: nodejs@22
+      base: nodejs@24
       # next start — Yarn 3 is not on the runtime PATH. If the process still
       # has an unresolved ${medusa_CHANNEL_PUBLISHABLE_KEY}, instrumentation
       # exits so the supervisor respawns with the current env store. Medusa
